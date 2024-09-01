@@ -11,7 +11,7 @@ const MessageContainer: React.FC = () => {
     const bottomRef = useRef<HTMLDivElement>(null);
     const [inputData, setInputData] = useState<InputData>({
         url: "https://www.investopedia.com/terms/a/artificial-intelligence-ai.asp", // Just for testing
-        content: "What is AI ?",
+        content: "What is AI?",
     });
     const [messages, setMessages] = useState<any[]>([]);
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
@@ -19,13 +19,20 @@ const MessageContainer: React.FC = () => {
         localStorageId ? localStorageId : null
     );
 
+    const scrollToBottom = () => {
+        bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
     const handleSend = async () => {
-        if (!inputData.url || !inputData.content) {
-            toast.error("Enter URL and Question");
+        if (!inputData.content) {
+            toast.error("Ask something");
+            return;
+        }
+        if (!conversationId && !inputData.url) {
+            toast.error("Enter URL");
             return;
         }
         try {
-            bottomRef?.current?.scrollIntoView();
             setIsGenerating(true);
             // Optimistically update UI with user message
             const newMessage = {
@@ -36,7 +43,7 @@ const MessageContainer: React.FC = () => {
             setMessages((prevMessages) => [...prevMessages, newMessage]);
 
             const { data } = await axios.post("/api/crawler", {
-                url: inputData.url,
+                url: inputData.url ? inputData.url : undefined,
                 content: inputData.content,
                 conversationId: conversationId ? conversationId : undefined,
             });
@@ -45,18 +52,14 @@ const MessageContainer: React.FC = () => {
             console.log("response", data);
             if (!conversationId) {
                 setConversationId(data.response.conversationId);
-                if (conversationId) {
+                if (data.response.conversationId) {
                     window.localStorage.setItem(
                         "conversationId",
-                        conversationId!
+                        data.response.conversationId
                     );
                 }
             }
             setMessages((prevMessages) => [...prevMessages, data.response]);
-            bottomRef?.current?.scrollIntoView();
-
-            // Here you would also handle receiving the AI message
-            // This can be done via WebSocket or by polling
         } catch (error: any) {
             toast.error(error.message);
             console.error("Error sending message:", error);
@@ -79,7 +82,8 @@ const MessageContainer: React.FC = () => {
             );
             // console.log("message data", data);
             setMessages(data.response);
-            bottomRef?.current?.scrollIntoView();
+            console.log("messages", data.response);
+            scrollToBottom();
         } catch (error) {
             toast.error("Unable to get messages");
         }
@@ -91,6 +95,10 @@ const MessageContainer: React.FC = () => {
         }
     }, []);
 
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
     return (
         <div className="flex flex-col min-h-screen pt-12">
             <div className="flex-1 overflow-y-auto p-0 md:p-4">
@@ -100,9 +108,9 @@ const MessageContainer: React.FC = () => {
                 {isGenerating && (
                     <MessageBox data={{ creator: "ai", isGenerating: true }} />
                 )}
-                <div className="pt-40" ref={bottomRef} />
+                <div className="pt-44" ref={bottomRef} />
             </div>
-            <div className="fixed bottom-0 left-0 w-full px-4 pb-1.5">
+            <div className="fixed bottom-0 left-0 w-full px-1 md:px-4 pb-1.5">
                 <div className="w-full md:max-w-[90%] lg:w-[80%] mx-auto">
                     <ChatBox
                         inputData={inputData}

@@ -1,37 +1,35 @@
-export const formatDate = (createdAt: { seconds: number }) => {
-    const currentDate = new Date();
-    const pastDate = new Date(createdAt.seconds * 1000);
+export function formatTime(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
 
-    const diffInSeconds = Math.floor(
-        (currentDate.getTime() - pastDate.getTime()) / 1000
-    );
+    const isToday =
+        date.getDate() === now.getDate() &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear();
 
-    // Define time units in seconds
-    const secondsInMinute = 60;
-    const secondsInHour = 3600;
-    const secondsInDay = 86400;
-    const secondsInWeek = 604800;
-    const secondsInMonth = 2592000; // Rough approximation (30 days)
-    const secondsInYear = 31536000; // Rough approximation (365 days)
+    const isYesterday =
+        date.getDate() === now.getDate() - 1 &&
+        date.getMonth() === now.getMonth() &&
+        date.getFullYear() === now.getFullYear();
 
-    // Calculate the differences in various units
-    const years = Math.floor(diffInSeconds / secondsInYear);
-    const months = Math.floor(diffInSeconds / secondsInMonth);
-    const weeks = Math.floor(diffInSeconds / secondsInWeek);
-    const days = Math.floor(diffInSeconds / secondsInDay);
-    const hours = Math.floor(diffInSeconds / secondsInHour);
-    const minutes = Math.floor(diffInSeconds / secondsInMinute);
+    const formattedTime = date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+    });
 
-    // Return the most appropriate relative time string
-    if (years > 0) return `${years} year${years > 1 ? "s" : ""}`;
-    if (months > 0) return `${months} month${months > 1 ? "s" : ""}`;
-    if (weeks > 0) return `${weeks} week${weeks > 1 ? "s" : ""}`;
-    if (days > 0) return `${days} day${days > 1 ? "s" : ""}`;
-    if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""}`;
-    if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""}`;
-
-    return `${diffInSeconds} second${diffInSeconds > 1 ? "s" : ""}`;
-};
+    if (isToday) {
+        return `${formattedTime} today`;
+    } else if (isYesterday) {
+        return `${formattedTime} yesterday`;
+    } else {
+        const formattedDate = date.toLocaleDateString([], {
+            day: "2-digit",
+            month: "short",
+        });
+        return `${formattedTime} ${formattedDate}`;
+    }
+}
 
 export const formatAIText = (text: string): string => {
     return (
@@ -43,13 +41,13 @@ export const formatAIText = (text: string): string => {
             // Replace bullet points (lines that start with *)
             .replace(/^\*\s(.+)/gm, "<li>$1</li>")
 
-            // Wrap lists with <ul> tags
-            .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
+            // Wrap multiple <li> elements with a single <ul>
+            .replace(/(<li>[\s\S]*?<\/li>)/gm, "<ul>$1</ul>")
 
             // Replace bold text (**text**)
             .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
 
-            // Wrap paragraphs (text followed by a line break)
+            // Wrap paragraphs (lines that are not wrapped with HTML tags)
             .replace(
                 /^(?!<h[23]>|<ul>|<li>|<strong>|<\/strong>)(.+)$/gm,
                 "<p>$1</p>"

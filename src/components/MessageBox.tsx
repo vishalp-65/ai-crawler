@@ -2,6 +2,7 @@
 import { PiDotsThreeOutlineFill } from "react-icons/pi";
 import clsx from "clsx";
 import { formatAIText } from "@/utils/helper";
+import { formatTime } from "@/utils";
 
 interface MessageBoxProps {
     data: any;
@@ -10,10 +11,10 @@ interface MessageBoxProps {
 const MessageBox: React.FC<MessageBoxProps> = ({ data }) => {
     const isUser = data.creator === "user";
     const isGenerating = data.isGenerating;
-    const formattedMessage = formatAIText(data.message);
+    const formattedMessage = formatAIText(data.message ? data.message : "");
 
     const container = clsx(
-        "flex gap-3 py-4 px-0 md:px-2",
+        "flex gap-1 py-2 px-0 md:px-2",
         isUser && "justify-end"
     );
 
@@ -37,14 +38,16 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data }) => {
                     <div className="text-sm text-gray-500">
                         {isUser ? "You" : "AI bot"}
                     </div>
-                    <div className="text-xs text-gray-400">today</div>
+                    <div className="text-xs text-gray-400">
+                        {formatTime(data.createdAt)}
+                    </div>
                 </div>
                 <div className={message}>
                     <div>
                         {isGenerating ? (
                             <div className="flex items-center">
-                                <PiDotsThreeOutlineFill className="animate-pulse text-2xl" />
-                                <span className="ml-2">AI is typing...</span>
+                                <PiDotsThreeOutlineFill className="animate-bounce text-3xl w-full text-nowrap" />
+                                {/* <span className="ml-2">AI is typing...</span> */}
                             </div>
                         ) : isUser ? (
                             <p>{data.message}</p>

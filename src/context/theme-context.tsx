@@ -11,6 +11,7 @@ type ThemeContextProviderProps = {
 type ThemeContextType = {
     theme: Theme;
     toggleTheme: () => void;
+    setCurrTheme: (value: "light" | "dark") => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
@@ -22,6 +23,18 @@ export default function ThemeContextProvider({
 
     const toggleTheme = () => {
         if (theme === "light") {
+            setTheme("dark");
+            window.localStorage.setItem("crawler_theme", "dark");
+            document.documentElement.classList.add("dark");
+        } else {
+            setTheme("light");
+            window.localStorage.setItem("crawler_theme", "light");
+            document.documentElement.classList.remove("dark");
+        }
+    };
+
+    const setCurrTheme = (value: "light" | "dark") => {
+        if (value === "dark") {
             setTheme("dark");
             window.localStorage.setItem("crawler_theme", "dark");
             document.documentElement.classList.add("dark");
@@ -54,6 +67,7 @@ export default function ThemeContextProvider({
             value={{
                 theme,
                 toggleTheme,
+                setCurrTheme,
             }}
         >
             {children}

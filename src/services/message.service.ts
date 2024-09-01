@@ -11,16 +11,22 @@ class MessageService {
         content: string,
         conversationId?: string
     ) {
-        if (!url || !content) {
+        if (!content) {
             throw new ApiError(httpStatus.BAD_REQUEST, "All fields required");
+        }
+        if (!conversationId && !url) {
+            throw new ApiError(httpStatus.BAD_REQUEST, "URL is required");
         }
         try {
             let conversation;
             let aiMessageResponse: any;
+            let crawledData;
 
             // Crawl the web page
-            const { data } = await axios.get(url);
-            const crawledData = await dataCrawler(data);
+            if (url) {
+                const { data } = await axios.get(url);
+                crawledData = await dataCrawler(data);
+            }
 
             // Store the user's message
             const userMessage: any = await MessagesModel.create({
@@ -59,13 +65,14 @@ class MessageService {
             // Generate AI response asynchronously
             const geminiText = await generateAIMessage(
                 content,
-                crawledData.text
+                crawledData?.text ? crawledData?.text : undefined
             );
+
             aiMessageResponse = await MessagesModel.create({
                 message: geminiText,
                 creator: "ai",
                 conversationId: conversation._id,
-                crawlDataId: crawledData.crawlResponse._id,
+                crawlDataId: crawledData?.crawlResponse?._id,
                 createdAt: new Date(),
             });
 

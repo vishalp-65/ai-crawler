@@ -40,7 +40,9 @@ export default function RootLayout({
                 <ThemeContextProvider>
                     <div className="px-2 md:px-12 lg:px-32 flex items-center justify-center">
                         {children}
-                        <ThemeSwitch />
+                        <div className="hidden md:block">
+                            <ThemeSwitch />
+                        </div>
                         <Toaster />
                     </div>
                 </ThemeContextProvider>

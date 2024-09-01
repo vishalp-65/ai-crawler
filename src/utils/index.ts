@@ -1,6 +1,6 @@
 import ApiError from "./ApiError";
 import catchAsync from "./catchAsync";
-import { formatDate } from "./helper";
+import { formatTime } from "./helper";
 import { connectDB } from "./database";
 
-export { ApiError, catchAsync, formatDate, connectDB };
+export { ApiError, catchAsync, formatTime, connectDB };

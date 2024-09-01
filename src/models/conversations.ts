@@ -15,7 +15,6 @@ const ConversationSchema: Schema = new Schema(
         ],
         url: {
             type: String,
-            required: true,
         },
     },
     { timestamps: true }

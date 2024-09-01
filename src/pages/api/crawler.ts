@@ -12,7 +12,7 @@ const crawler = catchAsync(
 
         // Validate request body
         const schema = Joi.object({
-            url: Joi.string().uri().required(),
+            url: Joi.string().uri().optional(),
             content: Joi.string().required(),
             conversationId: Joi.string().optional(),
         });
