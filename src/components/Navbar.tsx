@@ -3,7 +3,6 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { Settings, User } from "lucide-react";
 import { IoMoonOutline } from "react-icons/io5";
-import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -22,14 +21,13 @@ import { IoIosMenu } from "react-icons/io";
 import { FiSun } from "react-icons/fi";
 import { CiCirclePlus } from "react-icons/ci";
 import { useTheme } from "@/context/theme-context";
-import { BsMoon, BsSun } from "react-icons/bs";
 import { UserModal } from "./UserModal";
 
 type Props = {};
 
 const Navbar = (props: Props) => {
-    const { theme, toggleTheme, setCurrTheme } = useTheme();
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(true);
+    const { setCurrTheme } = useTheme();
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -44,7 +42,7 @@ const Navbar = (props: Props) => {
             className="flex items-center justify-between h-12 shadow-sm border border-t-0 px-4
         border-gray-400 dark:border-gray-600 bg-gray-100/80 dark:bg-gray-700/50 rounded-md backdrop-blur-md"
         >
-            <div className="ml-3 font-serif font-semibold cursor-pointer">
+            <div className="font-serif font-semibold cursor-pointer">
                 <Image
                     src="/chatgpt.svg"
                     alt="homeicon"
@@ -54,15 +52,9 @@ const Navbar = (props: Props) => {
                 />
                 {/* <p>Chat Bot</p> */}
             </div>
-            <button
-                className="block md:hidden w-[3rem] h-[3rem] flex items-center justify-center active:scale-105 transition-all "
-                onClick={toggleTheme}
-            >
-                {theme === "light" ? <BsSun /> : <BsMoon />}
-            </button>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <div className="bg-gray-200 cursor-pointer dark:bg-gray-700 dark:text-white px-3.5 py-3 rounded-md">
+                    <div className="text-2xl cursor-pointer dark:bg-gray-700 dark:text-white">
                         <IoIosMenu />
                     </div>
                 </DropdownMenuTrigger>

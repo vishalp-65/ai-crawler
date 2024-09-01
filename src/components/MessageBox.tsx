@@ -9,7 +9,7 @@ interface MessageBoxProps {
 }
 
 const MessageBox: React.FC<MessageBoxProps> = ({ data }) => {
-    const isUser = data.creator === "user";
+    const isUser = data.role === "user";
     const isGenerating = data.isGenerating;
     const formattedMessage = formatAIText(data.message ? data.message : "");
 
@@ -20,13 +20,13 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data }) => {
 
     const avatar = clsx(isUser && "order-2");
 
-    const body = clsx("flex flex-col gap-2", isUser && "items-end");
+    const body = clsx("flex flex-col gap-2 w-[85%]", isUser && "items-end");
 
     const message = clsx(
         "text-sm w-fit overflow-hidden",
         isUser
             ? "bg-teal-500 dark:bg-secondary text-white"
-            : "bg-gray-200/70 shadow-sm dark:bg-gray-700 mr-[18%] px-3",
+            : "bg-gray-200/70 shadow-sm dark:bg-gray-700 px-3",
         "rounded-2xl py-2 px-3"
     );
 

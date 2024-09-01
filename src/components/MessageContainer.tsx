@@ -37,12 +37,12 @@ const MessageContainer: React.FC = () => {
             // Optimistically update UI with user message
             const newMessage = {
                 message: inputData.content,
-                creator: "user",
+                role: "user",
                 createdAt: new Date(),
             };
             setMessages((prevMessages) => [...prevMessages, newMessage]);
 
-            const { data } = await axios.post("/api/crawler", {
+            const { data } = await axios.post("/api/ask", {
                 url: inputData.url ? inputData.url : undefined,
                 content: inputData.content,
                 conversationId: conversationId ? conversationId : undefined,
@@ -106,7 +106,13 @@ const MessageContainer: React.FC = () => {
                     <MessageBox key={index} data={message} />
                 ))}
                 {isGenerating && (
-                    <MessageBox data={{ creator: "ai", isGenerating: true }} />
+                    <MessageBox
+                        data={{
+                            role: "model",
+                            isGenerating: true,
+                            createdAt: new Date(),
+                        }}
+                    />
                 )}
                 <div className="pt-44" ref={bottomRef} />
             </div>
@@ -117,6 +123,7 @@ const MessageContainer: React.FC = () => {
                         setInputData={setInputData}
                         handleSend={handleSend}
                         isGenerating={isGenerating}
+                        conversationId={conversationId}
                     />
                 </div>
             </div>

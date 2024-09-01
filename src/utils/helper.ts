@@ -32,25 +32,30 @@ export function formatTime(dateString: string): string {
 }
 
 export const formatAIText = (text: string): string => {
-    return (
-        text
-            // Replace headers (lines that start with ## or ###)
-            .replace(/^##\s(.+)/gm, "<h2>$1</h2>") // H2
-            .replace(/^###\s(.+)/gm, "<h3>$1</h3>") // H3
+    // Regular expressions for various formatting elements
+    const boldRegex = /\*\*(.+?)\*\*/g;
+    const italicRegex = /\_(.+?)\_/g;
+    const bulletPointRegex = /^\*\s(.+)/gm;
+    const orderedListRegex = /^\d+\.\s(.+)/gm;
+    const codeBlockRegex = /```([a-zA-Z0-9]*)\n([\s\S]*?)```/g;
+    const paragraphRegex =
+        /^(?!<h[23]>|<ul>|<li>|<strong>|<\/strong>|<em>|<\/em>|<code>|<\/code>|<pre>|<\/pre>)(.+)$/gm;
 
-            // Replace bullet points (lines that start with *)
-            .replace(/^\*\s(.+)/gm, "<li>$1</li>")
+    // Convert formatting elements to HTML tags
+    let formattedText = text
+        .replace(boldRegex, "<strong>$1</strong>")
+        .replace(italicRegex, "<em>$1</em>")
+        .replace(bulletPointRegex, "<li>$1</li>")
+        .replace(orderedListRegex, "<ol><li>$1</li></ol>")
+        .replace(codeBlockRegex, "<pre><code>$2</code></pre>")
+        .replace(paragraphRegex, "<p>$1</p>");
 
-            // Wrap multiple <li> elements with a single <ul>
-            .replace(/(<li>[\s\S]*?<\/li>)/gm, "<ul>$1</ul>")
+    // Wrap multiple <li> elements within their respective list containers
+    formattedText = formattedText
+        .replace(/(<li>[\s\S]*?<\/li>)(?=\s*<li>)/gm, "<ul>$1</ul>")
+        .replace(/(<li>[\s\S]*?<\/li>)(?![\s\S]*<li>)/gm, "<ul>$1</ul>")
+        .replace(/(<ol><li>[\s\S]*?<\/li>)(?=\s*<li>)/gm, "<ol>$1</ol>")
+        .replace(/(<ol><li>[\s\S]*?<\/li>)(?![\s\S]*<li>)/gm, "<ol>$1</ol>");
 
-            // Replace bold text (**text**)
-            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-
-            // Wrap paragraphs (lines that are not wrapped with HTML tags)
-            .replace(
-                /^(?!<h[23]>|<ul>|<li>|<strong>|<\/strong>)(.+)$/gm,
-                "<p>$1</p>"
-            )
-    );
+    return formattedText;
 };

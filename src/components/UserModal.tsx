@@ -33,17 +33,17 @@ export function UserModal({ isOpen, onClose }: IModalProps) {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue="Pedro Duarte"
+                            defaultValue="Your name"
                             className="col-span-3"
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="username" className="text-right">
-                            Username
+                            Your Age
                         </Label>
                         <Input
                             id="username"
-                            defaultValue="@peduarte"
+                            defaultValue="24"
                             className="col-span-3"
                         />
                     </div>

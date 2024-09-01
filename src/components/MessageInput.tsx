@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
@@ -10,6 +10,7 @@ interface MessageInputProps {
     setInputData: React.Dispatch<React.SetStateAction<InputData>>;
     handleSend: () => void;
     isGenerating: boolean;
+    conversationId: string | null;
 }
 
 const ChatBox: React.FC<MessageInputProps> = ({
@@ -17,9 +18,11 @@ const ChatBox: React.FC<MessageInputProps> = ({
     setInputData,
     handleSend,
     isGenerating,
+    conversationId,
 }) => {
-    const localStorageId = window.localStorage.getItem("conversationId");
-    const [isURLEnable, setIsURLEnable] = useState<boolean>(true);
+    const [isURLEnable, setIsURLEnable] = useState<boolean>(
+        conversationId === null
+    );
     const handleChange = (
         e: React.ChangeEvent<
             HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -31,6 +34,12 @@ const ChatBox: React.FC<MessageInputProps> = ({
             [name]: value,
         });
     };
+
+    useEffect(() => {
+        if (conversationId) {
+            setIsURLEnable(false);
+        }
+    }, [conversationId]);
 
     return (
         <div
@@ -66,7 +75,7 @@ const ChatBox: React.FC<MessageInputProps> = ({
                 <div className="flex items-center gap-1 mb-3 text-sm">
                     <Switch
                         checked={isURLEnable}
-                        disabled={isGenerating || !localStorageId}
+                        disabled={isGenerating || !conversationId}
                         onCheckedChange={() => setIsURLEnable(!isURLEnable)}
                     />
                     <p>URL</p>

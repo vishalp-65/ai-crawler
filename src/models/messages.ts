@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IMessageData extends Document {
     crawlDataId: String;
     message: string;
-    creator: "user" | "ai";
+    creator: "user" | "model";
     createdAt: Date;
 }
 
@@ -16,7 +16,7 @@ const MessageSchema: Schema = new Schema(
         message: {
             type: String,
         },
-        creator: {
+        role: {
             type: String,
             default: "user",
             required: true,

@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import { ApiError } from "../utils";
 import axios from "axios";
 import { MessagesModel, ConversationModel, CrawlModel } from "@/models";
-import generateAIMessage from "./ai.service";
+import generateAIMessage, { startingAIChat } from "./ai.service";
 import { dataCrawler } from "@/utils/CrawlData";
 
 class MessageService {
@@ -21,6 +21,7 @@ class MessageService {
             let conversation;
             let aiMessageResponse: any;
             let crawledData;
+            let geminiText;
 
             // Crawl the web page
             if (url) {
@@ -31,7 +32,7 @@ class MessageService {
             // Store the user's message
             const userMessage: any = await MessagesModel.create({
                 message: content,
-                creator: "user",
+                role: "user",
                 createdAt: new Date(),
             });
 
@@ -46,6 +47,11 @@ class MessageService {
                 // Update user message with conversationId
                 userMessage.conversationId = conversation._id;
                 await userMessage.save();
+                // Generate AI response asynchronously
+                geminiText = await generateAIMessage(
+                    content,
+                    crawledData?.text ? crawledData?.text : undefined
+                );
             } else {
                 // Find existing conversation and update
                 conversation = await ConversationModel.findById(conversationId);
@@ -60,17 +66,25 @@ class MessageService {
                 // Update user message with conversationId
                 userMessage.conversationId = conversation._id;
                 await userMessage.save();
-            }
 
-            // Generate AI response asynchronously
-            const geminiText = await generateAIMessage(
-                content,
-                crawledData?.text ? crawledData?.text : undefined
-            );
+                // Starting AI chat using previous messages history
+                const messages = await MessagesModel.find({
+                    _id: { $in: conversation.messages },
+                }).sort({ createdAt: 1 });
+
+                // Format the message history
+                const formattedMessages = messages.map((msg: any) => ({
+                    role: msg.role,
+                    parts: [{ text: msg.message }],
+                }));
+
+                // Generate AI response asynchronously
+                geminiText = await startingAIChat(content, formattedMessages);
+            }
 
             aiMessageResponse = await MessagesModel.create({
                 message: geminiText,
-                creator: "ai",
+                role: "model",
                 conversationId: conversation._id,
                 crawlDataId: crawledData?.crawlResponse?._id,
                 createdAt: new Date(),
@@ -81,7 +95,7 @@ class MessageService {
             await conversation.save();
             return {
                 message: aiMessageResponse?.message,
-                creator: aiMessageResponse?.creator,
+                role: aiMessageResponse?.role,
                 createdAt: aiMessageResponse?.createdAt,
                 conversationId: conversation._id,
                 messageId: aiMessageResponse?._id,
