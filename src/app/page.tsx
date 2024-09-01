@@ -1,7 +1,5 @@
 import MessageContainer from "@/components/MessageContainer";
-import ChatBox from "@/components/MessageInput";
 import Navbar from "@/components/Navbar";
-import Image from "next/image";
 
 export default function Home() {
     return (
@@ -10,9 +8,6 @@ export default function Home() {
                 <Navbar />
             </div>
             <MessageContainer />
-            <div className="absolute bottom-0 w-full pb-3">
-                <ChatBox />
-            </div>
         </div>
     );
 }

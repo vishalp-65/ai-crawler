@@ -1,5 +1,5 @@
 "use client";
-
+import { PiDotsThreeOutlineFill } from "react-icons/pi";
 import { formatDate } from "@/utils";
 import clsx from "clsx";
 import Image from "next/image";
@@ -7,10 +7,10 @@ import { useState } from "react";
 
 interface MessageBoxProps {
     data: any;
-    isLast?: boolean;
+    isGenerating: boolean;
 }
 
-const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
+const MessageBox: React.FC<MessageBoxProps> = ({ data, isGenerating }) => {
     const [imageModalOpen, setImageModalOpen] = useState(false);
 
     const isOwn = true;
@@ -54,7 +54,13 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
                         "
                         />
                     ) : (
-                        <div>Message ye hai </div>
+                        <div>
+                            {isGenerating ? (
+                                <PiDotsThreeOutlineFill className="text-2xl animate-bounce" />
+                            ) : (
+                                "Message is here"
+                            )}{" "}
+                        </div>
                     )}
                 </div>
             </div>

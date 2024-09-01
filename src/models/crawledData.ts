@@ -1,26 +1,26 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-interface ICrawledData extends Document {
-    url: string;
+interface ICrawlData extends Document {
     text: string;
     images: string[];
     links: string[];
+    createdAt: Date;
 }
 
-const CrawledDataSchema: Schema = new Schema({
-    url: {
-        type: String,
-        required: true,
+const CrawledDataSchema: Schema = new Schema(
+    {
+        text: {
+            type: String,
+            required: true,
+        },
+        images: [{ type: String }],
+        links: [{ type: String }],
     },
-    text: {
-        type: String,
-        required: true,
-    },
-    images: [{ type: String }],
-    links: [{ type: String }],
-});
-
-export const CrawledData = mongoose.model<ICrawledData>(
-    "CrawledData",
-    CrawledDataSchema
+    { timestamps: true }
 );
+
+const CrawlModel: Model<ICrawlData> =
+    mongoose.models.crawlData ||
+    mongoose.model<ICrawlData>("crawlData", CrawledDataSchema);
+
+export default CrawlModel;

@@ -1,3 +1,3 @@
-import CrawlerService from "./crawl.service";
+import MessageService from "./message.service";
 
-export { CrawlerService };
+export { MessageService };

@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ThemeContextProvider from "@/context/theme-context";
 import ThemeSwitch from "@/components/theme-switch";
+import { Toaster } from "react-hot-toast";
+import { connectDB } from "@/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,6 +18,8 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    connectDB();
+
     return (
         <html lang="en">
             <body
@@ -37,6 +41,7 @@ export default function RootLayout({
                     <div className="px-32 flex items-center justify-center">
                         {children}
                         <ThemeSwitch />
+                        <Toaster />
                     </div>
                 </ThemeContextProvider>
             </body>
