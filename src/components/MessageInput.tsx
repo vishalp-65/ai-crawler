@@ -32,7 +32,7 @@ const ChatBox: React.FC<MessageInputProps> = ({
     return (
         <div
             className="flex items-end justify-between gap-4 border border-gray-400/70 dark:border-gray-600 
-        rounded-md px-3 py-4 shadow-md w-full dark:bg-gray-900/30 backdrop-blur-sm"
+        rounded-md px-3 py-4 shadow-md w-full dark:bg-gray-900/30 backdrop-blur-md"
         >
             <div className="flex flex-col items-center justify-between gap-3 w-full">
                 <Input
@@ -41,8 +41,9 @@ const ChatBox: React.FC<MessageInputProps> = ({
                     name="url"
                     value={inputData.url}
                     placeholder="Enter website URL for crawl"
-                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900/50 backdrop-blur-sm"
+                    className="border-gray-300 bg-gray-100/80 dark:border-gray-700 dark:bg-gray-900/50 backdrop-blur-sm"
                     onChange={handleChange}
+                    disabled={isGenerating}
                     required
                 />
                 <Textarea
@@ -50,8 +51,9 @@ const ChatBox: React.FC<MessageInputProps> = ({
                     name="content"
                     value={inputData.content}
                     placeholder="Ask what you want"
-                    className="max-h-40 border-gray-300 dark:border-gray-700 dark:bg-gray-900/50 backdrop-blur-sm"
+                    className="max-h-40 border-gray-300 bg-gray-100/80 dark:border-gray-700 dark:bg-gray-900/50 backdrop-blur-sm"
                     onChange={handleChange}
+                    disabled={isGenerating}
                     required
                 />
             </div>
@@ -59,9 +61,9 @@ const ChatBox: React.FC<MessageInputProps> = ({
                 size="lg"
                 className="dark:bg-secondary hover:dark:bg-secondary/80"
                 onClick={handleSend}
-                disabled={isGenerating}
+                disabled={isGenerating || !inputData.url || !inputData.content}
             >
-                Send
+                {isGenerating ? "Processing..." : "Send"}
             </Button>
         </div>
     );

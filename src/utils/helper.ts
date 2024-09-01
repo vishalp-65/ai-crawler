@@ -32,3 +32,27 @@ export const formatDate = (createdAt: { seconds: number }) => {
 
     return `${diffInSeconds} second${diffInSeconds > 1 ? "s" : ""}`;
 };
+
+export const formatAIText = (text: string): string => {
+    return (
+        text
+            // Replace headers (lines that start with ## or ###)
+            .replace(/^##\s(.+)/gm, "<h2>$1</h2>") // H2
+            .replace(/^###\s(.+)/gm, "<h3>$1</h3>") // H3
+
+            // Replace bullet points (lines that start with *)
+            .replace(/^\*\s(.+)/gm, "<li>$1</li>")
+
+            // Wrap lists with <ul> tags
+            .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
+
+            // Replace bold text (**text**)
+            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+
+            // Wrap paragraphs (text followed by a line break)
+            .replace(
+                /^(?!<h[23]>|<ul>|<li>|<strong>|<\/strong>)(.+)$/gm,
+                "<p>$1</p>"
+            )
+    );
+};

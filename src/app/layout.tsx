@@ -38,7 +38,7 @@ export default function RootLayout({
                       dark:bg-[#312f48]"
                 />
                 <ThemeContextProvider>
-                    <div className="px-32 flex items-center justify-center">
+                    <div className="px-2 md:px-12 lg:px-32 flex items-center justify-center">
                         {children}
                         <ThemeSwitch />
                         <Toaster />

@@ -16,30 +16,32 @@ class MessageService {
         }
         try {
             let conversation;
-            let response: any;
+            let aiMessageResponse: any;
+
+            // Crawl the web page
             const { data } = await axios.get(url);
             const crawledData = await dataCrawler(data);
 
-            const geminiText = await generateAIMessage(
-                content,
-                crawledData.text
-            );
+            // Store the user's message
+            const userMessage: any = await MessagesModel.create({
+                message: content,
+                creator: "user",
+                createdAt: new Date(),
+            });
 
+            // Handle conversation creation or updating
             if (!conversationId) {
-                // Create a new conversation and message
-                response = await MessagesModel.create({
-                    crawlDataId: crawledData.crawlResponse._id,
-                    message: geminiText,
-                    creator: "ai",
-                });
+                // Create a new conversation
                 conversation = await ConversationModel.create({
-                    messages: [response._id],
+                    messages: [userMessage._id],
                     url: url,
+                    createdAt: new Date(),
                 });
-                crawledData.crawlResponse.messageId = response._id;
-                await crawledData.crawlResponse.save();
+                // Update user message with conversationId
+                userMessage.conversationId = conversation._id;
+                await userMessage.save();
             } else {
-                // Find the conversation and add the new message
+                // Find existing conversation and update
                 conversation = await ConversationModel.findById(conversationId);
                 if (!conversation) {
                     throw new ApiError(
@@ -47,27 +49,41 @@ class MessageService {
                         "Conversation not found"
                     );
                 }
-                response = await MessagesModel.create({
-                    conversationId, // Assign the conversationId
-                    crawlDataId: crawledData.crawlResponse._id,
-                    message: geminiText,
-                    creator: "ai",
-                });
-                conversation.messages.push(response._id);
+                conversation.messages.push(userMessage._id);
                 await conversation.save();
+                // Update user message with conversationId
+                userMessage.conversationId = conversation._id;
+                await userMessage.save();
             }
 
-            return {
-                geminiText,
+            // Generate AI response asynchronously
+            const geminiText = await generateAIMessage(
+                content,
+                crawledData.text
+            );
+            aiMessageResponse = await MessagesModel.create({
+                message: geminiText,
+                creator: "ai",
                 conversationId: conversation._id,
-                messageId: response._id,
-                createdAt: response.createdAt,
+                crawlDataId: crawledData.crawlResponse._id,
+                createdAt: new Date(),
+            });
+
+            // Update conversation with AI message
+            conversation.messages.push(aiMessageResponse._id);
+            await conversation.save();
+            return {
+                message: aiMessageResponse?.message,
+                creator: aiMessageResponse?.creator,
+                createdAt: aiMessageResponse?.createdAt,
+                conversationId: conversation._id,
+                messageId: aiMessageResponse?._id,
             };
         } catch (error) {
-            console.log("Error while crawling", error);
+            console.log("Error while processing messages", error);
             throw new ApiError(
                 httpStatus.INTERNAL_SERVER_ERROR,
-                "Unable to crawl web URL"
+                "Unable to process messages"
             );
         }
     }
