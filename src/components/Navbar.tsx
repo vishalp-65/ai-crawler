@@ -97,6 +97,8 @@ const Navbar = (props: Props) => {
                     <GoogleLogin
                         onSuccess={handleLoginWithGoogle}
                         text="signin"
+                        size="medium"
+                        shape="circle"
                     />
                 )}
                 {/* <button

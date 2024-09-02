@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -10,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context/user_context";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 interface IModalProps {
     isOpen: boolean;
@@ -17,7 +20,36 @@ interface IModalProps {
 }
 
 export function UserModal({ isOpen, onClose }: IModalProps) {
-    const { user } = useUser();
+    const { user, fetchUserData } = useUser();
+    const [name, setName] = useState<string>(user?.name || "");
+    const [age, setAge] = useState<number>(user?.age || 0);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
+
+    const handleSaveChanges = async () => {
+        if (!name || !age) {
+            toast.error("Please fill in all fields.");
+            return;
+        }
+
+        setIsSaving(true);
+
+        try {
+            await axios.put("/api/user/update", {
+                email: user?.email,
+                name,
+                age,
+            });
+
+            toast.success("Profile updated successfully.");
+            fetchUserData(); // Refresh user data
+            onClose(); // Close the modal
+        } catch (error) {
+            console.error("Failed to update user:", error);
+            toast.error("Failed to update profile.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -36,17 +68,20 @@ export function UserModal({ isOpen, onClose }: IModalProps) {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue={user?.name}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             className="col-span-3"
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="username" className="text-right">
+                        <Label htmlFor="age" className="text-right">
                             Your Age
                         </Label>
                         <Input
-                            id="username"
-                            defaultValue={user?.age ? user?.age : 0}
+                            id="age"
+                            type="number"
+                            value={age}
+                            onChange={(e) => setAge(parseInt(e.target.value))}
                             className="col-span-3"
                         />
                     </div>
@@ -55,9 +90,10 @@ export function UserModal({ isOpen, onClose }: IModalProps) {
                     <Button
                         type="submit"
                         className="dark:text-white"
-                        onClick={onClose}
+                        onClick={handleSaveChanges}
+                        disabled={isSaving}
                     >
-                        Save changes
+                        {isSaving ? "Saving..." : "Save changes"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

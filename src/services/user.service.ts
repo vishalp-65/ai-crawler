@@ -75,6 +75,23 @@ class UserService {
 
         return updatedUser;
     }
+
+    public static async updateUser(
+        email: string,
+        user: Partial<{ name: string; age: number }>
+    ) {
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { email: email },
+            { $set: { name: user.name, age: user.age } },
+            { new: true, runValidators: true } // Return the updated document and run validators
+        );
+
+        if (!updatedUser) {
+            throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+        }
+
+        return updatedUser;
+    }
 }
 
 export default UserService;
