@@ -7,6 +7,7 @@ import React, {
     useState,
 } from "react";
 import axios from "axios";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface User {
     name: string;
@@ -36,6 +37,8 @@ export const useUser = () => {
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -58,13 +61,29 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
             });
             setUser(data);
             setError(null);
+            const conversationId = searchParams?.get("conversationId");
+            if (
+                conversationId &&
+                !data.conversationId.includes(conversationId)
+            ) {
+                // Add the conversationId to the user model if it's not there already
+                await axios.put(
+                    `/api/user/conversation`,
+                    { conversationId },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+            }
         } catch (err) {
             console.error("Failed to fetch user data:", err);
             setError("Failed to fetch user data");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [searchParams]);
 
     useEffect(() => {
         fetchUserData();

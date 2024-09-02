@@ -54,6 +54,27 @@ class UserService {
 
         return user;
     }
+
+    public static async updateConversation(conversationId: string, user: any) {
+        if (!conversationId) {
+            throw new ApiError(
+                httpStatus.UNAUTHORIZED,
+                "conversationId required"
+            );
+        }
+
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { email: user.email },
+            { $addToSet: { conversationId: conversationId } },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+        }
+
+        return updatedUser;
+    }
 }
 
 export default UserService;

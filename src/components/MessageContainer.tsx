@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import MessageBox from "./MessageBox";
 import ChatBox from "./MessageInput";
 import toast from "react-hot-toast";
@@ -19,11 +19,26 @@ const MessageContainer: React.FC = () => {
         localStorageId ? localStorageId : null
     );
 
-    const scrollToBottom = () => {
+    const scrollToBottom = useCallback(() => {
         bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    }, []);
 
-    const handleSend = async () => {
+    const fetchMessage = useCallback(
+        async (conversationId: string) => {
+            try {
+                const { data } = await axios.get(
+                    `/api/conversation/${conversationId}`
+                );
+                setMessages(data.response);
+                scrollToBottom();
+            } catch (error) {
+                toast.error("Unable to get messages");
+            }
+        },
+        [scrollToBottom]
+    );
+
+    const handleSend = useCallback(async () => {
         if (!inputData.content) {
             toast.error("Ask something");
             return;
@@ -32,8 +47,10 @@ const MessageContainer: React.FC = () => {
             toast.error("Enter URL");
             return;
         }
+
         try {
             setIsGenerating(true);
+
             // Optimistically update UI with user message
             const newMessage = {
                 message: inputData.content,
@@ -59,6 +76,7 @@ const MessageContainer: React.FC = () => {
                     );
                 }
             }
+
             setMessages((prevMessages) => [...prevMessages, data.response]);
         } catch (error: any) {
             toast.error(error.message);
@@ -69,31 +87,15 @@ const MessageContainer: React.FC = () => {
                 url: "",
                 content: "",
             });
-        }
-    };
-
-    const fetchMessage = async (conversationId: string) => {
-        if (!conversationId) {
-            return;
-        }
-        try {
-            const { data } = await axios.get(
-                `api/conversation/${conversationId}`
-            );
-            // console.log("message data", data);
-            setMessages(data.response);
-            console.log("messages", data.response);
             scrollToBottom();
-        } catch (error) {
-            toast.error("Unable to get messages");
         }
-    };
+    }, [inputData.content, inputData.url, conversationId, scrollToBottom]);
 
     useEffect(() => {
-        if (localStorageId) {
-            fetchMessage(localStorageId);
+        if (conversationId) {
+            fetchMessage(conversationId);
         }
-    }, []);
+    }, [conversationId, fetchMessage]);
 
     useEffect(() => {
         scrollToBottom();

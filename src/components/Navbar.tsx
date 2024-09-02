@@ -37,12 +37,12 @@ const Navbar = (props: Props) => {
     const { setCurrTheme } = useTheme();
     const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const conversationId = window.localStorage.getItem("conversationId");
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
     const handleNewChat = () => {
-        const conversationId = window.localStorage.getItem("conversationId");
         if (!conversationId) return;
         window.localStorage.removeItem("conversationId");
         window.location.reload();
