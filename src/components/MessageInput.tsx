@@ -43,8 +43,8 @@ const ChatBox: React.FC<MessageInputProps> = ({
 
     return (
         <div
-            className="flex items-end justify-between gap-4 border border-gray-400/70 dark:border-gray-600 
-        rounded-md px-3 py-4 shadow-md w-full bg-gray-100/80 dark:bg-gray-900/60 backdrop-blur-md"
+            className="z-10 flex items-end justify-between gap-4 border border-gray-400/70 dark:border-gray-600 
+        rounded-md px-3 py-4 shadow-lg w-full bg-gray-100/80 dark:bg-gray-900/60 backdrop-blur-md"
         >
             <div className="flex flex-col items-center justify-between gap-3 w-full">
                 {isURLEnable && (

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useCallback, useState } from "react";
-import { Settings, User } from "lucide-react";
+import { LogOut, Settings, User } from "lucide-react";
 import { IoMoonOutline } from "react-icons/io5";
 import {
     DropdownMenu,
@@ -26,6 +26,7 @@ import { FcGoogle } from "react-icons/fc";
 import {
     CredentialResponse,
     GoogleLogin,
+    googleLogout,
     useGoogleLogin,
 } from "@react-oauth/google";
 import toast from "react-hot-toast";
@@ -38,13 +39,15 @@ type Props = {};
 const Navbar = (props: Props) => {
     const { setCurrTheme } = useTheme();
     const router = useRouter();
-    const { user, loading } = useUser();
+    const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
     const handleNewChat = () => {
+        const conversationId = window.localStorage.getItem("conversationId");
+        if (!conversationId) return;
         window.localStorage.removeItem("conversationId");
         window.location.reload();
     };
@@ -71,20 +74,27 @@ const Navbar = (props: Props) => {
         [router]
     );
 
+    const handleLogout = () => {
+        googleLogout();
+        window.localStorage.removeItem("__ai_chatbot_token");
+        window.localStorage.removeItem("conversationId");
+        window.location.reload();
+    };
+
     return (
         <div
             className="flex items-center justify-between h-12 shadow-sm border border-t-0 px-4
         border-gray-400 dark:border-gray-600 bg-gray-100/80 dark:bg-gray-700/50 rounded-md backdrop-blur-md"
         >
-            <div className="font-serif font-semibold cursor-pointer">
+            <div className="font-medium cursor-pointer flex items-center justify-start gap-3">
                 <Image
-                    src="/chatgpt.svg"
+                    src="/gemini.svg"
                     alt="homeicon"
                     width={40}
                     height={40}
                     className="w-9 h-9 rounded-full"
                 />
-                {/* <p>Chat Bot</p> */}
+                <p>AI Bot</p>
             </div>
             <div className="flex items-center justify-end gap-2">
                 {!user && (
@@ -101,12 +111,17 @@ const Navbar = (props: Props) => {
                 </button> */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <div className="text-2xl cursor-pointer dark:bg-gray-700 dark:text-white">
+                        <div className="text-3xl cursor-pointer hover:scale-110">
                             <IoIosMenu />
                         </div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56">
-                        <DropdownMenuLabel>{`Hi ${user?.name}`}</DropdownMenuLabel>
+                        <DropdownMenuLabel>
+                            <span className="font-normal">Hi {"  "}</span>
+                            <span className="font-medium">
+                                {user ? user.name : "Human"}
+                            </span>
+                        </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem
@@ -157,11 +172,18 @@ const Navbar = (props: Props) => {
                                 </DropdownMenuPortal>
                             </DropdownMenuSub>
                         </DropdownMenuRadioGroup>
-                        {/* <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>Log out</span>
-                    </DropdownMenuItem> */}
+                        {user && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={handleLogout}
+                                >
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log out</span>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

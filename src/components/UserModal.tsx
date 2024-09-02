@@ -9,6 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useUser } from "@/context/user_context";
 
 interface IModalProps {
     isOpen: boolean;
@@ -16,6 +17,8 @@ interface IModalProps {
 }
 
 export function UserModal({ isOpen, onClose }: IModalProps) {
+    const { user } = useUser();
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[425px]">
@@ -33,7 +36,7 @@ export function UserModal({ isOpen, onClose }: IModalProps) {
                         </Label>
                         <Input
                             id="name"
-                            defaultValue="Your name"
+                            defaultValue={user?.name}
                             className="col-span-3"
                         />
                     </div>
@@ -43,13 +46,17 @@ export function UserModal({ isOpen, onClose }: IModalProps) {
                         </Label>
                         <Input
                             id="username"
-                            defaultValue="24"
+                            defaultValue={user?.age ? user?.age : 0}
                             className="col-span-3"
                         />
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit" onClick={onClose}>
+                    <Button
+                        type="submit"
+                        className="dark:text-white"
+                        onClick={onClose}
+                    >
                         Save changes
                     </Button>
                 </DialogFooter>

@@ -1,9 +1,17 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import axios from "axios";
 
 interface User {
     name: string;
     email: string;
+    age: number;
     profileImageURL: string;
     conversationId: string[];
 }
@@ -32,7 +40,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchUserData = async () => {
+    const fetchUserData = useCallback(async () => {
         setLoading(true);
         const token = window.localStorage.getItem("__ai_chatbot_token");
 
@@ -56,15 +64,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchUserData();
-    }, []);
+    }, [fetchUserData]);
+
+    const value = useMemo(
+        () => ({ user, loading, error, fetchUserData }),
+        [user, loading, error, fetchUserData]
+    );
 
     return (
-        <UserContext.Provider value={{ user, loading, error, fetchUserData }}>
-            {children}
-        </UserContext.Provider>
+        <UserContext.Provider value={value}>{children}</UserContext.Provider>
     );
 };

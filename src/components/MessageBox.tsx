@@ -25,7 +25,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data }) => {
     const message = clsx(
         "text-sm w-fit overflow-hidden",
         isUser
-            ? "bg-teal-500 dark:bg-secondary text-white"
+            ? "bg-primary dark:bg-secondary text-white"
             : "bg-gray-200/70 shadow-sm dark:bg-gray-700 px-3",
         "rounded-2xl py-2 px-3"
     );
