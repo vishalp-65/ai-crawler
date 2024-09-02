@@ -7,7 +7,6 @@ import React, {
     useState,
 } from "react";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
 
 interface User {
     name: string;
@@ -37,8 +36,6 @@ export const useUser = () => {
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
-    const router = useRouter();
-    const searchParams = useSearchParams();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -61,7 +58,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
             });
             setUser(data);
             setError(null);
-            const conversationId = searchParams?.get("conversationId");
+            const conversationId =
+                window.localStorage?.getItem("conversationId");
             if (
                 conversationId &&
                 !data.conversationId.includes(conversationId)
@@ -83,7 +81,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         } finally {
             setLoading(false);
         }
-    }, [searchParams]);
+    }, []);
 
     useEffect(() => {
         fetchUserData();
