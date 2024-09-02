@@ -45,15 +45,15 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data }) => {
                 <div className={message}>
                     <div>
                         {isGenerating ? (
-                            <div className="flex items-center">
+                            <div className="flex items-center justify-center">
                                 <PiDotsThreeOutlineFill className="animate-bounce text-3xl w-full text-nowrap" />
-                                {/* <span className="ml-2">AI is typing...</span> */}
+                                {/* <span className="ml-2 text-lg">typing...</span> */}
                             </div>
                         ) : isUser ? (
                             <p>{data.message}</p>
                         ) : (
                             <div
-                                className="formatted-message"
+                                className="formatted-message text-wrap"
                                 dangerouslySetInnerHTML={{
                                     __html: formattedMessage,
                                 }}

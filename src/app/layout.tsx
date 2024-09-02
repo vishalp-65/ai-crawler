@@ -5,6 +5,7 @@ import ThemeContextProvider from "@/context/theme-context";
 import ThemeSwitch from "@/components/theme-switch";
 import { Toaster } from "react-hot-toast";
 import { connectDB } from "@/utils";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +20,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     connectDB();
+    const clientId = process.env.NEXT_API_GOOGLE_CLIENT_ID as string;
 
     return (
         <html lang="en">
@@ -38,13 +40,15 @@ export default function RootLayout({
                       dark:bg-[#312f48]"
                 />
                 <ThemeContextProvider>
-                    <div className="px-2 md:px-12 lg:px-32 flex items-center justify-center">
-                        {children}
-                        <div className="hidden md:block">
-                            <ThemeSwitch />
+                    <GoogleOAuthProvider clientId={clientId}>
+                        <div className="px-2 md:px-12 lg:px-32 flex items-center justify-center">
+                            {children}
+                            <div className="hidden md:block">
+                                <ThemeSwitch />
+                            </div>
+                            <Toaster />
                         </div>
-                        <Toaster />
-                    </div>
+                    </GoogleOAuthProvider>
                 </ThemeContextProvider>
             </body>
         </html>
