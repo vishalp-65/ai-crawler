@@ -22,23 +22,19 @@ import { FiSun } from "react-icons/fi";
 import { CiCirclePlus } from "react-icons/ci";
 import { useTheme } from "@/context/theme-context";
 import { UserModal } from "./UserModal";
-import { FcGoogle } from "react-icons/fc";
 import {
     CredentialResponse,
     GoogleLogin,
     googleLogout,
-    useGoogleLogin,
 } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { useUser } from "@/context/user_context";
 
 type Props = {};
 
 const Navbar = (props: Props) => {
     const { setCurrTheme } = useTheme();
-    const router = useRouter();
     const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -71,7 +67,7 @@ const Navbar = (props: Props) => {
                 toast.error("Verification failed");
             }
         },
-        [router]
+        []
     );
 
     const handleLogout = () => {
