@@ -10,7 +10,7 @@ export default async function generateAIMessage(content: string, data?: any) {
     try {
         let result;
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-pro",
+            model: "gemini-1.5-flash",
         });
         if (data) {
             result = await model.generateContent([
@@ -33,7 +33,7 @@ export default async function generateAIMessage(content: string, data?: any) {
 export async function startingAIChat(content: string, history?: any[]) {
     console.log("Gemini chat start");
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // Initialize chat with history if available
         const chat = model.startChat({

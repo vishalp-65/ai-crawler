@@ -1,12 +1,15 @@
-import React from "react";
-import Navbar from "./Navbar";
-import MessageContainer from "./MessageContainer";
+import React, { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useUser } from "@/context/user_context";
 import { Loading } from "./Loading";
 
-type Props = {};
+// Dynamically import components with ssr: false
+const Navbar = dynamic(() => import("./Navbar"), { ssr: false });
+const MessageContainer = dynamic(() => import("./MessageContainer"), {
+    ssr: false,
+});
 
-const Container = (props: Props) => {
+const Container: React.FC = () => {
     const { loading } = useUser();
 
     if (loading) {
@@ -15,12 +18,14 @@ const Container = (props: Props) => {
 
     return (
         <div>
-            <div className="fixed top-0 left-0 w-full px-1 md:px-4 pb-1.5">
+            <div className="fixed top-0 left-0 w-full px-0 md:px-4 pb-1.5">
                 <div className="w-full md:max-w-[90%] lg:w-[80%] mx-auto">
                     <Navbar />
                 </div>
             </div>
-            <MessageContainer />
+            <Suspense fallback={<Loading />}>
+                <MessageContainer />
+            </Suspense>
         </div>
     );
 };

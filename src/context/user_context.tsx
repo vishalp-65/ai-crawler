@@ -1,3 +1,4 @@
+"use client";
 import React, {
     createContext,
     useCallback,
@@ -21,6 +22,7 @@ interface UserContextType {
     loading: boolean;
     error: string | null;
     fetchUserData: () => void;
+    handleConversationId: (id: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -39,10 +41,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [conversationId, setConversationId] = useState<string | null>(null);
+    let token: string | null;
 
     const fetchUserData = useCallback(async () => {
         setLoading(true);
-        const token = window.localStorage.getItem("__ai_chatbot_token");
+        token = window.localStorage.getItem("__ai_chatbot_token");
 
         if (!token) {
             setError("Token not found");
@@ -58,23 +62,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
             });
             setUser(data);
             setError(null);
-            const conversationId =
-                window.localStorage?.getItem("conversationId");
-            if (
-                conversationId &&
-                !data.conversationId.includes(conversationId)
-            ) {
-                // Add the conversationId to the user model if it's not there already
-                await axios.put(
-                    `/api/user/conversation`,
-                    { conversationId },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-            }
         } catch (err) {
             console.error("Failed to fetch user data:", err);
             setError("Failed to fetch user data");
@@ -83,13 +70,37 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }, []);
 
+    const updateConversationId = useCallback(async (id: string | null) => {
+        if (!id) return;
+        try {
+            // Add the conversationId to the user model if it's not there already
+            await axios.put(
+                `/api/user/conversation`,
+                { conversationId: id },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+        } catch (error) {}
+    }, []);
+
+    const handleConversationId = (id: string) => {
+        setConversationId(id);
+    };
+
     useEffect(() => {
         fetchUserData();
     }, [fetchUserData]);
 
+    useEffect(() => {
+        updateConversationId(conversationId);
+    }, [conversationId]);
+
     const value = useMemo(
-        () => ({ user, loading, error, fetchUserData }),
-        [user, loading, error, fetchUserData]
+        () => ({ user, loading, error, fetchUserData, handleConversationId }),
+        [user, loading, error, fetchUserData, handleConversationId]
     );
 
     return (

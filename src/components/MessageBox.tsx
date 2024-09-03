@@ -1,8 +1,9 @@
-"use client";
 import { PiDotsThreeOutlineFill } from "react-icons/pi";
 import clsx from "clsx";
 import { formatAIText } from "@/utils/helper";
 import { formatTime } from "@/utils";
+import Image from "next/image";
+import { useUser } from "@/context/user_context";
 
 interface MessageBoxProps {
     data: any;
@@ -10,17 +11,18 @@ interface MessageBoxProps {
 
 const MessageBox: React.FC<MessageBoxProps> = ({ data }) => {
     const isUser = data.role === "user";
+    const { user } = useUser();
     const isGenerating = data.isGenerating;
     const formattedMessage = formatAIText(data.message ? data.message : "");
 
     const container = clsx(
-        "flex gap-1 py-2 px-0 md:px-2",
+        "flex gap-2 py-2 px-0 md:px-2",
         isUser && "justify-end"
     );
 
     const avatar = clsx(isUser && "order-2");
 
-    const body = clsx("flex flex-col gap-2 w-[85%]", isUser && "items-end");
+    const body = clsx("flex flex-col gap-1 w-[85%]", isUser && "items-end");
 
     const message = clsx(
         "text-sm w-fit overflow-hidden",
@@ -32,9 +34,35 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data }) => {
 
     return (
         <div className={container}>
-            <div className={avatar}></div>
+            <div className={avatar}>
+                <div
+                    className="
+                        -z-10
+                        relative 
+                        inline-block 
+                        rounded-full 
+                        overflow-hidden
+                    "
+                >
+                    <Image
+                        width={20}
+                        height={20}
+                        src={
+                            isUser
+                                ? user?.profileImageURL
+                                    ? user?.profileImageURL
+                                    : "/placeholder.jpg"
+                                : "/gemini.svg"
+                        }
+                        alt="Avatar"
+                        className={`${
+                            isUser ? "h-10 w-10 rounded-full" : "w-7 h-7"
+                        }`}
+                    />
+                </div>
+            </div>
             <div className={body}>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                     <div className="text-sm text-gray-500">
                         {isUser ? "You" : "AI bot"}
                     </div>

@@ -13,7 +13,7 @@ interface MessageInputProps {
     conversationId: string | null;
 }
 
-const ChatBox: React.FC<MessageInputProps> = ({
+const MessageInput: React.FC<MessageInputProps> = ({
     inputData,
     setInputData,
     handleSend,
@@ -43,8 +43,8 @@ const ChatBox: React.FC<MessageInputProps> = ({
 
     return (
         <div
-            className="z-10 flex items-end justify-between gap-4 border border-gray-400/70 dark:border-gray-600 
-        rounded-md px-3 py-4 shadow-lg w-full bg-gray-100/80 dark:bg-gray-900/60 backdrop-blur-md"
+            className="z-10 flex items-end justify-between gap-4 border border-gray-300 dark:border-gray-700 border-b-0
+        rounded-md px-3 py-4 shadow-lg w-full bg-gray-100/80 dark:bg-gray-900/70 backdrop-blur-md"
         >
             <div className="flex flex-col items-center justify-between gap-3 w-full">
                 {isURLEnable && (
@@ -54,7 +54,7 @@ const ChatBox: React.FC<MessageInputProps> = ({
                         name="url"
                         value={inputData.url}
                         placeholder="Enter website URL for crawl"
-                        className="border-gray-300 bg-gray-200/80 dark:border-gray-700 dark:bg-gray-900/50 backdrop-blur-sm"
+                        className="border-gray-300 bg-gray-200/80 dark:border-gray-800/70 dark:bg-gray-800/50 backdrop-blur-sm"
                         onChange={handleChange}
                         disabled={isGenerating}
                         required
@@ -65,7 +65,7 @@ const ChatBox: React.FC<MessageInputProps> = ({
                     name="content"
                     value={inputData.content}
                     placeholder="Ask what you want"
-                    className="max-h-40 border-gray-300 bg-gray-200/80 dark:border-gray-700 dark:bg-gray-900/50 backdrop-blur-sm"
+                    className="max-h-40 border-gray-300 bg-gray-200/80 dark:border-gray-700 dark:bg-gray-800/50 backdrop-blur-sm"
                     onChange={handleChange}
                     disabled={isGenerating}
                     required
@@ -93,4 +93,4 @@ const ChatBox: React.FC<MessageInputProps> = ({
     );
 };
 
-export default ChatBox;
+export default MessageInput;

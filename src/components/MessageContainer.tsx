@@ -1,22 +1,26 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import MessageBox from "./MessageBox";
-import ChatBox from "./MessageInput";
+import MessageInput from "./MessageInput";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { InputData } from "@/types";
+import { useSearchParams } from "next/navigation";
+import { useUser } from "@/context/user_context";
 
 const MessageContainer: React.FC = () => {
-    const localStorageId = window.localStorage.getItem("conversationId");
+    const searchParams = useSearchParams();
+    const id = searchParams ? searchParams.get("conversationId") : null;
+    const { handleConversationId } = useUser();
     const bottomRef = useRef<HTMLDivElement>(null);
     const [inputData, setInputData] = useState<InputData>({
         url: "https://www.investopedia.com/terms/a/artificial-intelligence-ai.asp", // Just for testing
-        content: "What is AI?",
+        content: "What is AI ?",
     });
     const [messages, setMessages] = useState<any[]>([]);
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [conversationId, setConversationId] = useState<string | null>(
-        localStorageId ? localStorageId : null
+        id ? id : null
     );
 
     const scrollToBottom = useCallback(() => {
@@ -65,18 +69,11 @@ const MessageContainer: React.FC = () => {
                 conversationId: conversationId ? conversationId : undefined,
             });
 
-            // Update conversationId if it's a new conversation
-            console.log("response", data);
+            // Setting conversation ID
             if (!conversationId) {
                 setConversationId(data.response.conversationId);
-                if (data.response.conversationId) {
-                    window.localStorage.setItem(
-                        "conversationId",
-                        data.response.conversationId
-                    );
-                }
             }
-
+            // Update message state
             setMessages((prevMessages) => [...prevMessages, data.response]);
         } catch (error: any) {
             toast.error(error.message);
@@ -99,7 +96,18 @@ const MessageContainer: React.FC = () => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages, scrollToBottom]);
+
+    useEffect(() => {
+        if (conversationId) {
+            window.history.pushState(
+                null,
+                "",
+                `?conversationId=${conversationId}`
+            );
+            handleConversationId(conversationId);
+        }
+    }, [conversationId]);
 
     return (
         <div className="flex flex-col min-h-screen pt-12">
@@ -118,9 +126,9 @@ const MessageContainer: React.FC = () => {
                 )}
                 <div className="pt-44" ref={bottomRef} />
             </div>
-            <div className="fixed bottom-0 left-0 w-full px-1 md:px-4 pb-1.5">
+            <div className="fixed bottom-0 left-0 w-full px-0 md:px-4">
                 <div className="w-full md:max-w-[90%] lg:w-[80%] mx-auto">
-                    <ChatBox
+                    <MessageInput
                         inputData={inputData}
                         setInputData={setInputData}
                         handleSend={handleSend}

@@ -30,6 +30,7 @@ import {
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useUser } from "@/context/user_context";
+import { useSearchParams } from "next/navigation";
 
 type Props = {};
 
@@ -37,14 +38,21 @@ const Navbar = (props: Props) => {
     const { setCurrTheme } = useTheme();
     const { user } = useUser();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const conversationId = window.localStorage.getItem("conversationId");
+    const searchParams = useSearchParams();
+    const conversationId = searchParams
+        ? searchParams?.get("conversationId")
+        : null;
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
     const handleNewChat = () => {
         if (!conversationId) return;
-        window.localStorage.removeItem("conversationId");
+
+        // Remove conversationId from the URL
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.delete("conversationId");
+        window.history.replaceState(null, "", currentUrl.toString());
         window.location.reload();
     };
 
@@ -73,14 +81,13 @@ const Navbar = (props: Props) => {
     const handleLogout = () => {
         googleLogout();
         window.localStorage.removeItem("__ai_chatbot_token");
-        window.localStorage.removeItem("conversationId");
         window.location.reload();
     };
 
     return (
         <div
-            className="flex items-center justify-between h-12 shadow-sm border border-t-0 px-4
-        border-gray-400 dark:border-gray-600 bg-gray-100/80 dark:bg-gray-700/50 rounded-md backdrop-blur-md"
+            className="flex items-center justify-between h-12 px-3 shadow-md 
+        bg-gray-100/80 dark:bg-gray-700/70 rounded-md backdrop-blur-md"
         >
             <div className="font-medium cursor-pointer flex items-center justify-start gap-3">
                 <Image
